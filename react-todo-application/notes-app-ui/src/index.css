@@ -11,20 +11,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.note-form button:hover{
-  background-color: rgb(106, 175, 198);
-  cursor: pointer;
-}
-.edit-buttons button:last-of-type{
-  background-color: rgb(220, 89, 89);
-  color: #fff;
-}
-.edit-buttons button{
-  flex:1;
-}
-.edit-buttons{
-  display: flex;
-  justify-content: space-evenly;
-  gap: 5px;
-}

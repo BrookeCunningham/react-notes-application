@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { title } from "process";
+
 
 type Note = {
 
@@ -12,112 +13,39 @@ type Note = {
 
 const App = () => {
 
-  const [notes, setNotes] = useState<Note[]>([
+  const [notes, setNotes] = useState<Note[]>([]);
+   useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/notes"
+        );
 
-    {
-      id: 1,
-      title: "test note 1",
-      content: "bla bla note1",
-    },
-    {
-      id: 2,
-      title: "test note 2 ",
-      content: "bla bla note2",
-    },
-    {
-      id: 3,
-      title: "test note 3",
-      content: "bla bla note3",
-    },
-    {
-      id: 4,
-      title: "test note 4 ",
-      content: "bla bla note4",
-    },
-    {
-      id: 5,
-      title: "test note 5",
-      content: "bla bla note5",
-    },
-    {
-      id: 6,
-      title: "test note 6",
-      content: "bla bla note6",
-    },
-  ]);
+        const notes: Note[] =
+          await response.json();
+
+        setNotes(notes);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    fetchNotes();
+  }, []);
+  
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const handleNoteClick = (note: Note) => {
-    setSelectedNote(note);
-    setTitle(note.title);
-    setContent(note.content);
-  };
-
-
-
-  const handleAddNote = (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
-
-    const newNote: Note = {
-      id: notes.length + 1,
-      title: title,
-      content: content,
-    };
-
-    setNotes([newNote, ...notes]);
-    setTitle("");
-    setContent("");
-
-
+    console.log("title: ", title);
+    console.log("content: ", content);
   };
-
-
-  const handleUpdateNote = (event: React.FormEvent) => {
-    event.preventDefault();
-  
-    if (!selectedNote) {
-      return;
-    }
-  
-    const updatedNote: Note = {
-      id: selectedNote.id,
-      title: title,
-      content: content,
-    };
-  
-    const updatedNotesList = notes.map((note) => (note.id === selectedNote.id ? updatedNote : note));
-  
-    setNotes(updatedNotesList);
-    setTitle("");
-    setContent("");
-    setSelectedNote(null);
-  };
-
-  const handleCancel = () => {
-
-    setTitle("");
-    setContent("");
-    setSelectedNote(null);
-  }
-
-  const deleteNote = (event: React.MouseEvent, noteId: number) => {
-    event.stopPropagation();
-  
-    const updatedNotes = notes.filter((note) => note.id !== noteId);
-  
-    setNotes(updatedNotes);
-  };
-
-
     return (
       <div className="app-container">
         <form className="note-form"
-          onSubmit={(event) => handleAddNote(event)}
-          >
+        onSubmit={(event) => handleSubmit(event)}
+        >
           <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
@@ -130,37 +58,19 @@ const App = () => {
           placeholder="Content"
           rows={10}
           required
-          ></textarea> 
-          <form
-           className="note-form"
-           onSubmit={(event) => (selectedNote ? handleUpdateNote(event) : handleAddNote(event))}>
-              {selectedNote ? (
-          <div className="edit-buttons">
-          <button type="submit">Save</button>
-          <button onClick={handleCancel}>Cancel</button>
-          </div>
-           ) : (
-          <button type="submit">Add Note</button> )}
-         </form>
-         
-         </form>
-
-
+          ></textarea>
+  
+          <button type="submit">Add Note</button>
+        </form>
         <div className="notes-grid">
         {notes.map((note) => (
-        <div className="note-item"
-        onClick={() => handleNoteClick(note)}
-        >
+        <div className="note-item">
         <div className="notes-header">
-        <button
-        onClick={(event) => deleteNote(event, note.id)}
-        
-        >x</button>
+        <button>x</button>
         </div>
       <h2>{note.title}</h2>
       <p>{note.content}</p>
       </div>
-      
      ))}
    </div>
 
